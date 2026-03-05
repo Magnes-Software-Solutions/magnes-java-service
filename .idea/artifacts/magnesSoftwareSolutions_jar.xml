@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="magnesSoftwareSolutions:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/magnesSoftwareSolutions_jar</output-path>
+    <root id="archive" name="magnesSoftwareSolutions.jar">
+      <element id="module-output" name="magnesSoftwareSolutions" />
+    </root>
+  </artifact>
+</component>
