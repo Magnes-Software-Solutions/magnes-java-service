@@ -1,39 +1,36 @@
 package software.magnes.solutions;
 
-import org.json.JSONObject;
 import software.magnes.solutions.jira.Jira;
-import software.magnes.solutions.slack.Slack;
-
-import java.io.IOException;
+import java.util.List;
 
 public class Main {
-    public static void main(String[] args) throws Exception, IOException, InterruptedException  {
-        // Adicionar card no Jira
-        String baseUrl = "https://magnessolutions.atlassian.net";
-        String email = "magnessolutions@gmail.com";
-        String apiToken = "";
-        Jira jira = new Jira(baseUrl, email, apiToken);
-
-        String mensagem = "ALERTA CRÍTICO!";
-
-        String response = jira.createIssue(
-                "KM", // Substitua pela key do seu projeto que estará presente na URL do seu site
-                // ex: "https://java-integration.atlassian.net/jira/software/projects/SCRUM/boards/1/backlog" -> a parte "SCRUM" é a key desse projeto
-                mensagem, // Nome da issue
-                "Task" // Tipo da issue, pode ser "Task", "Bug", "Story", etc. Verifique os tipos disponíveis no seu projeto para usar o correto
+    public static void main(String[] args) throws Exception {
+        Jira jira = new Jira(
+                "https://magnessolutions.atlassian.net",
+                "magnessolutions@gmail.com",
+                ""
         );
 
-        System.out.println(response);
-        // Se a requisição for bem-sucedida confira o backlog do seu projeto para ver a nova issue que foi criada
+        S3Reader leitor = new S3Reader(
+                "",
+                "",
+                "",
+                ""
+        );
 
+        List<String[]> dados = leitor.ler("trusted/");
+        System.out.println("Dados carregados: " + dados.size());
 
+        if (dados.isEmpty()) {
+            System.out.println("Nenhum dado encontrado.");
+            return;
+        }
 
+        String[] cabecalho = dados.get(0);
+        AlertaService alerta = new AlertaService(jira, cabecalho);
 
-        // Mandar mensagem slack
-        JSONObject json = new JSONObject();
-
-        json.put("text", mensagem);
-
-        Slack.sendMessage(json);
+        for (int i = 1; i < dados.size(); i++) {
+            alerta.emitir(dados.get(i));
+        }
     }
 }
